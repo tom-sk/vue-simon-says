@@ -1,23 +1,28 @@
 <template>
   <div id="app">
 
-    <button v-if='!playing' @click='seqGen' :disabled='buttonDisabled'>Start</button>
-    <button v-if='playing' @click='restart' :disabled='buttonDisabled'>Restart</button>
+
     <!-- {{ seq }} -->
     <div>Steps: {{ seq.length }} </div>
-    <div class='button-grid'>
-      <button :class="{ hightlight: isHightlight.one}" @click='valCheck' value='1'>1</button>  
-      <button :class="{ hightlight: isHightlight.two}" @click='valCheck' value='2'>2</button>  
-      <button :class="{ hightlight: isHightlight.three}" @click='valCheck' value='3'>3</button>  
-      <button :class="{ hightlight: isHightlight.four}" @click='valCheck' value='4'>4</button>  
-    </div> 
+    <div class='tile-grid'>
+      <button class='tile t1' :class="{ hightlight: isHightlight.one}" @click='valCheck' value='1'></button>  
+      <button class='tile t2' :class="{ hightlight: isHightlight.two}" @click='valCheck' value='2'></button>  
+      <button class='tile t3' :class="{ hightlight: isHightlight.three}" @click='valCheck' value='3'></button>  
+      <button class='tile t4' :class="{ hightlight: isHightlight.four}" @click='valCheck' value='4'></button>  
+      <div class='alert lose-alert' v-if='lose'>You Lost!</div>
+      <div class='alert win-alert' v-if='win'>You Win!</div>
 
-<div v-if='lose'>You Lost!</div>
+    </div> 
+    
+    <button class='button start' v-if='!playing' @click='seqGen' :disabled='buttonDisabled'>Start</button>
+    <button class='button reset' v-if='playing' @click='restart' :disabled='buttonDisabled'>Restart</button>
+    
 
   </div>
 </template>
 
 <script>
+  const delay = require('delay');
   export default {
     name: 'app',
     data(){
@@ -28,6 +33,7 @@
         counter: 0,
         score: 0,
         lose: false,
+        win: false,
         buttonDisabled: false,
         isHightlight: {
           'one': false,
@@ -39,43 +45,58 @@
     },
     methods: {
       seqPlayBack(){
-      
         var loop = this.seq.length - 1;
-        var i = 0;
+        var i = 0, j = 0;
         let sequence = this.seq;
         
         this.buttonDisabled = true;
+  
             var looper = () => {
-                console.log(sequence[i]);
+
+              if(this.win == true){
+                clearTimeout(looper);
+
+                for(j = 1; j <= 4; j++){
+                  this.isHightlight[this.numToWord(j)] = true;
+
+                  delay(1000)
+                    .then(() => {
+                        for(j = 1; j <= 4; j++){
+                          this.isHightlight[this.numToWord(j)] = false;
+                        }
+
+                    });
+
+                }
+
+
+                this.playing = false;
+                this.buttonDisabled = false;
+                this.win = false;
+                this.seq = [];
+                return;
+              }
 
                 this.isHightlight[this.numToWord(sequence[i])] = true;
 
                 if (i < loop) {
-
                 setTimeout(()=>{
                     this.isHightlight[this.numToWord(sequence[i])] = false;
                     i++;
                  }, 300);
-
                 } else {
                     this.buttonDisabled = false;
                    
-
                   setTimeout(() => {
                       this.isHightlight[this.numToWord(sequence[loop])] = false;
                       loop--;
-
                     }, 300);
-                    
                     clearTimeout(looper);
                     return;
                 }
-        
                 setTimeout(looper, 1000);
             };
-        
         looper();
- 
       },
       seqGen(){
         this.playing = true;
@@ -83,6 +104,7 @@
         let number = Math.floor(Math.random() * (4 - 0) + 1);
         this.seq.push(number);
         this.seqPlayBack()
+        this.winCheck()
         this.counter = 0;
       },
       valCheck(e){
@@ -121,7 +143,13 @@
         this.counter = 0;
         this.score = 0;
         this.lose = false;
+        this.win = false;
         this.buttonDisabled = false;
+      },
+      winCheck(){
+        if(this.seq.length == 2){
+          this.win = true;
+        }
       }
     },
     computed: {
@@ -132,14 +160,85 @@
         }
       }
     },
-   
   }
 </script>
 
 <style lang="">
+  #app {
+    font-family: arial;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+  }
+  .button {
+    width: 100px;
+    height: 30px;
+    border: none;
+    outline: none;
+  }
+  .start {
+    color: white;
+    background:#78909c;
+  }
+  .reset {
+    color: white;
+    background:#757575;
+  }
+  .tile-grid {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    width:205px;
+    border-radius: 10px;
+  }
+
+  .tile {
+    border: none;
+    outline: none;
+    margin: 1px;
+    width: 100px;
+    height: 100px;
+  }
+
+  .t1 {
+    background: #03A9F4;
+    border-top-left-radius: 100%;
+  }
+  .t2 {
+    background: #00c853;
+    border-top-right-radius:  100%;
+  }
+  .t3 {
+    background: #ffd600;
+    border-bottom-left-radius: 100%;
+  }
+  .t4 {
+    background: #f44336;
+    border-bottom-right-radius: 100%;
+  }
 
   .hightlight {
     background: hotpink;
   }
 
+  .lose-alert {
+    background: #e57373;
+  }
+  .win-alert {
+    background: #66bb6a;
+  }
+  .alert {
+    position: absolute;
+    top:0px;
+    width: 205px;
+    height: 205px;
+    border-radius: 100%;
+    font-size: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 </style>

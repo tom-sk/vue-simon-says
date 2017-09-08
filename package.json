@@ -13,7 +13,12 @@
   },
   "babel": {
     "presets": [
-      ["vue-app", {"useBuiltIns": true}]
+      [
+        "vue-app",
+        {
+          "useBuiltIns": true
+        }
+      ]
     ]
   },
   "author": {
@@ -21,6 +26,7 @@
     "email": "thomasscullyking@hotmail.com"
   },
   "dependencies": {
+    "delay": "^2.0.0",
     "normalize.css": "^7.0.0",
     "object-assign": "^4.1.1",
     "promise-polyfill": "^6.0.2"
