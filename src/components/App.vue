@@ -3,7 +3,7 @@
 
 
     <!-- {{ seq }} -->
-    <div>Steps: {{ seq.length }} </div>
+    <div class='steps'> {{ scoreCalc }} </div>
     <div class='tile-grid'>
       <button class='tile t1' :class="{ hightlight: isHightlight.one}" @click='valCheck' value='1'></button>  
       <button class='tile t2' :class="{ hightlight: isHightlight.two}" @click='valCheck' value='2'></button>  
@@ -14,9 +14,13 @@
 
     </div> 
     
-    <button class='button start' v-if='!playing' @click='seqGen' :disabled='buttonDisabled'>Start</button>
-    <button class='button reset' v-if='playing' @click='restart' :disabled='buttonDisabled'>Restart</button>
+    <button class='button start' v-if='!playing' @click='seqGen' :disabled='buttonDisabled'>START</button>
+    <button class='button reset' v-if='playing' @click='restart' :disabled='buttonDisabled'>RESTART</button>
     
+    <div class='strict-mode-container'>
+        <span>Strict Mode</span>
+        <toggle-button :value="strict" :labels="true" @change="toggleStrict" />
+    </div>
 
   </div>
 </template>
@@ -34,6 +38,7 @@
         score: 0,
         lose: false,
         win: false,
+        strict: true,
         buttonDisabled: false,
         isHightlight: {
           'one': false,
@@ -64,16 +69,14 @@
                         for(j = 1; j <= 4; j++){
                           this.isHightlight[this.numToWord(j)] = false;
                         }
-
                     });
-
                 }
-
 
                 this.playing = false;
                 this.buttonDisabled = false;
                 this.win = false;
                 this.seq = [];
+                this.score = 0;
                 return;
               }
 
@@ -108,13 +111,15 @@
         this.counter = 0;
       },
       valCheck(e){
-        if(this.seq[this.counter] != e.target.value && this.seq.length) {
+        if(this.seq[this.counter] != e.target.value && this.seq.length && this.strict === true) {
           this.lose = true;
           this.counter = 0;
           this.score = 0;
           this.seq = [];
           this.playing = false;
           return;
+        } else if (this.seq[this.counter] != e.target.value && this.seq.length && this.strict === false) {
+          this.seqPlayBack()
         }
         this.lose = false;
         if(this.counter == this.seq.length - 1){
@@ -147,9 +152,12 @@
         this.buttonDisabled = false;
       },
       winCheck(){
-        if(this.seq.length == 2){
+        if(this.seq.length == 20){
           this.win = true;
         }
+      },
+      toggleStrict(){
+        this.strict = !this.strict;
       }
     },
     computed: {
@@ -158,12 +166,26 @@
           active: this.isActive && !this.error,
           'hightlight': this.error && this.error.type === 'fatal'
         }
+      },
+      scoreCalc(){
+        if(this.score < 10){
+          return '0' + this.score
+        }
+        return this.score;
       }
     },
   }
 </script>
 
 <style lang="">
+
+
+  @font-face {
+    font-family: "Bitstream Vera Serif Bold";
+    src: url("C:/Users/Tom/Documents/test-folder/vue/sim/fonts/style-7_digital-7/digital-7.ttf");
+  }
+
+
   #app {
     font-family: arial;
     position: relative;
@@ -171,8 +193,24 @@
     justify-content: center;
     flex-direction: column;
     align-items: center;
+    width:300px;
+    height:400px;
+    margin:auto;
+    background: #f5f5f5;
+  }
+  .steps {
+    font-family: 'Bitstream Vera Serif Bold';
+    font-size: 30px;
+    width:40px;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    color: #00c853;
+    background: #002;
+    margin:10px;
   }
   .button {
+    margin:10px;
     width: 100px;
     height: 30px;
     border: none;
@@ -202,7 +240,9 @@
     width: 100px;
     height: 100px;
   }
-
+  .tile:active{
+    background: #4dd0e1;
+  }
   .t1 {
     background: #03A9F4;
     border-top-left-radius: 100%;
@@ -240,5 +280,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  .strict-mode-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background:#d3d3d3;
+    width:150px;
+    height: 40px;
+    margin: 4px;
   }
 </style>
