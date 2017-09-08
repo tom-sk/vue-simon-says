@@ -15,11 +15,11 @@
     </div> 
     
     <button class='button start' v-if='!playing' @click='seqGen' :disabled='buttonDisabled'>START</button>
-    <button class='button reset' v-if='playing' @click='restart' :disabled='buttonDisabled'>RESTART</button>
+    <button class='button reset' v-if='playing' @click='restart' :disabled='buttonDisabled'>STOP</button>
     
     <div class='strict-mode-container'>
-        <span>Strict Mode</span>
-        <toggle-button :value="strict" :labels="true" @change="toggleStrict" />
+        <span class='strict-title'>STRICT MODE</span>
+        <toggle-button class='strict-toggle' :value="strict" :labels="true" @change="toggleStrict" />
     </div>
 
   </div>
@@ -106,7 +106,7 @@
         this.lose = false;
         let number = Math.floor(Math.random() * (4 - 0) + 1);
         this.seq.push(number);
-        this.seqPlayBack()
+        delay(1000).then(() => {this.seqPlayBack()})
         this.winCheck()
         this.counter = 0;
       },
@@ -190,14 +190,18 @@
     font-family: arial;
     position: relative;
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     flex-direction: column;
     align-items: center;
     width:300px;
     height:400px;
     margin:auto;
     background: #f5f5f5;
-  }
+    -webkit-box-shadow: -1px 7px 20px -2px rgba(0,0,0,0.35);
+    -moz-box-shadow: -1px 7px 20px -2px rgba(0,0,0,0.35);
+    box-shadow: -1px 7px 20px -2px rgba(0,0,0,0.35);
+    
+    }
   .steps {
     font-family: 'Bitstream Vera Serif Bold';
     font-size: 30px;
@@ -208,17 +212,29 @@
     color: #00c853;
     background: #002;
     margin:10px;
+    border: 1px solid #828282;
+    border-radius: 1px;
   }
   .button {
     margin:10px;
     width: 100px;
     height: 30px;
+    font-size: 15px;
     border: none;
     outline: none;
+    -webkit-box-shadow: -1px 11px 28px -6px rgba(0,0,0,0.35);
+    -moz-box-shadow: -1px 11px 28px -6px rgba(0,0,0,0.35);
+    box-shadow: -1px 11px 28px -6px rgba(0,0,0,0.35);
+    transition: all 200ms ease-in-out;
   }
+  .button:hover {
+    transform: translateY(-1px);
+  }
+
   .start {
     color: white;
     background:#78909c;
+
   }
   .reset {
     color: white;
@@ -283,12 +299,23 @@
   }
 
   .strict-mode-container {
+    font-size:15px;
     display: flex;
-    justify-content: space-around;
+    /* position: absolute; */
+    bottom:-4px;
+    /* left:-4px; */
+    justify-content: space-between;
     align-items: center;
     background:#d3d3d3;
-    width:150px;
+    width:100%;
     height: 40px;
-    margin: 4px;
+    margin: -10px;
+  }
+
+  .strict-title {
+    margin-left: 10px;
+  }
+  .strict-toggle {
+    margin-right: 10px;
   }
 </style>
